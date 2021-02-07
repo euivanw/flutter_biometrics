@@ -19,6 +19,14 @@ class Biometrics {
       } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
         return 'Touch ID';
       }
+    } else if (Platform.isAndroid) {
+      if (availableBiometrics.contains(BiometricType.face)) {
+        return 'Reconhecimento Facial';
+      } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+        return 'Impressão Digital';
+      } else if (availableBiometrics.contains(BiometricType.iris)) {
+        return 'Iris';
+      }
     }
 
     return '';
