@@ -1,16 +1,40 @@
-# flutter_biometrics
+# Exemplo de Uso de Biometria com Flutter
 
-A small sample using Biometrics in Flutter.
+Exemplifica como utilizar a package [local_auth](https://pub.dev/packages/local_auth) para habilitar o uso de biometria em aplicações [Flutter](https://flutter.dev).
 
-## Getting Started
+# Uso
 
-This project is a starting point for a Flutter application.
+Para utilizar, instale a package [local_auth](https://pub.dev/packages/local_auth) no arquivo pubspec.yaml.
 
-A few resources to get you started if this is your first Flutter project:
+No iOS, habilite o uso do FaceID, incluindo a linha abaixo no arquivo [`Info.plist`](./ios/Runner/Info.plist)`:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```plist
+<key>NSFaceIDUsageDescription</key>
+<string>Precisamos deste recurso para autenticar você.</string>
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+No Android, habilite o uso de biometria, inclindo a linha abaixo no arquivo [`AndroidManifest.xml`](./android/app/src/main/AndroidManifest.xml).
+
+```xml
+<uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+```
+
+Também altere a classe `FlutterActivity` pela classe `FlutterFragmentActivity` no arquivo [`MainActivity.kt`](./android/app/src/main/kotlin/io/github/ivanwhm/flutter_biometrics/MainActivity.kt).
+
+# Telas
+
+## TouchID (iOS)
+
+<img src="./assets/img/ios_touch_id.jpeg" alt="iOS (TouchID)" width="600"/>
+
+## FaceID (iOS)
+
+<img src="./assets/img/ios_face_id.jpeg" alt="iOS (FaceID)" width="600"/>
+
+## Impressão Digital (Android)
+
+<img src="./assets/img/android_fingerprint.jpg" alt="Impressão Digital (Android)" width="600"/>
+
+Feito com &hearts; por Ivan Wilhelm.
+
+Codificado no [Visual Studio Code](https://code.visualstudio.com) da [Microsoft](https://www.microsoft.com.br)
