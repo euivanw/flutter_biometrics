@@ -1,8 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
 
+import '../model/biometrics.dart';
 import 'error_view.dart';
 import 'home_view.dart';
 
@@ -14,11 +12,9 @@ class AuthView extends StatefulWidget {
 }
 
 class _AuthViewState extends State<AuthView> {
-  final LocalAuthentication _auth = LocalAuthentication();
   bool _isBusy = true;
   bool _isActive = false;
   String _buttonLabel = 'Aguarde...';
-  String _biometricType;
 
   @override
   void initState() {
@@ -38,7 +34,11 @@ class _AuthViewState extends State<AuthView> {
             children: [
               _icon(),
               _space(),
-              _isActive ? _activeButton() : _inactive(),
+              !_isBusy
+                  ? _isActive
+                      ? _button()
+                      : _inactive()
+                  : Container(),
             ],
           ),
         ),
@@ -64,40 +64,10 @@ class _AuthViewState extends State<AuthView> {
     );
   }
 
-  Widget _activeButton() {
+  Widget _button() {
     return ElevatedButton(
       child: Text(_buttonLabel),
-      onPressed: _isBusy
-          ? null
-          : () {
-              _auth.canCheckBiometrics.then(
-                (bool result) {
-                  if (result) {
-                    _auth
-                        .authenticateWithBiometrics(
-                      localizedReason: _messages()[0],
-                      useErrorDialogs: true,
-                      stickyAuth: true,
-                    )
-                        .then(
-                      (bool result) {
-                        if (result) {
-                          _goToHomeView();
-                        } else {
-                          _goToErrorView(_messages()[2]);
-                        }
-                      },
-                    ).catchError(
-                      (_) => _goToErrorView(_messages()[1]),
-                    );
-                  } else {
-                    _goToErrorView(_messages()[3]);
-                  }
-                },
-              ).catchError(
-                (_) => _goToErrorView(_messages()[1]),
-              );
-            },
+      onPressed: _isBusy ? null : _dealAuthentication,
     );
   }
 
@@ -107,45 +77,37 @@ class _AuthViewState extends State<AuthView> {
     );
   }
 
-  void _loadBiometricType() async {
-    List<BiometricType> availableBiometrics =
-        await _auth.getAvailableBiometrics();
+  void _loadBiometricType() {
+    Biometrics.isActive().then((active) {
+      setState(() {
+        _isActive = active;
+      });
+    });
 
-    if (Platform.isIOS) {
-      if (availableBiometrics.contains(BiometricType.face)) {
-        _setBiometricType('Face ID');
-      } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-        _setBiometricType('Touch ID');
-      }
-    }
-  }
-
-  void _setBiometricType(String biometricType) {
-    setState(() {
-      _biometricType = biometricType;
-      _buttonLabel = 'Autenticar usando $_biometricType';
-      _isBusy = false;
-      _isActive = true;
+    Biometrics.getStringType().then((type) {
+      setState(() {
+        _buttonLabel = 'Autenticar usando $type';
+        _isBusy = false;
+      });
     });
   }
 
-  List<String> _messages() {
-    return [
-      'Aqui vai a sua mensagem explicando porque precisa de autenticação por biometria.',
-      'Ocorreu um erro ao identificar se seu aparelho possui biometria habilitada ou não.',
-      'A autenticação falhou.',
-      'A biometria não está disponível.'
-    ];
-  }
-
-  void _goToHomeView() {
-    Navigator.of(context).pushReplacementNamed(HomeView.routeName);
-  }
-
-  void _goToErrorView(String message) {
-    Navigator.of(context).pushNamed(
-      ErrorView.routeName,
-      arguments: ErrorArgs(message),
-    );
+  void _dealAuthentication() {
+    Biometrics.authenticate().then((success) {
+      if (success) {
+        Navigator.of(context).pushReplacementNamed(
+          HomeView.routeName,
+        );
+      } else {
+        Navigator.of(context).pushNamed(
+          ErrorView.routeName,
+          arguments: ErrorArgs('A autenticação falhou.'),
+        );
+      }
+    }).catchError((_) {
+      setState(() {
+        _isActive = false;
+      });
+    });
   }
 }

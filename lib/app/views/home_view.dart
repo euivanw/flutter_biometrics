@@ -46,7 +46,9 @@ class HomeView extends StatelessWidget {
     return ElevatedButton(
       child: Text('Sair'),
       onPressed: () {
-        Navigator.of(context).pushReplacementNamed(AuthView.routeName);
+        Navigator.of(context).pushReplacementNamed(
+          AuthView.routeName,
+        );
       },
     );
   }
