@@ -16,6 +16,7 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   final LocalAuthentication _auth = LocalAuthentication();
   bool _isBusy = true;
+  bool _isActive = false;
   String _buttonLabel = 'Aguarde...';
   String _biometricType;
 
@@ -37,7 +38,7 @@ class _AuthViewState extends State<AuthView> {
             children: [
               _icon(),
               _space(),
-              _button(),
+              _isActive ? _activeButton() : _inactive(),
             ],
           ),
         ),
@@ -48,12 +49,22 @@ class _AuthViewState extends State<AuthView> {
   Widget _icon() {
     return Icon(
       Icons.fingerprint,
-      color: Colors.blue,
+      color: _isActive ? Colors.blue : Colors.red,
       size: 64.0,
     );
   }
 
-  Widget _button() {
+  Widget _inactive() {
+    return Text(
+      'A biometria está inativa.',
+      style: TextStyle(
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _activeButton() {
     return ElevatedButton(
       child: Text(_buttonLabel),
       onPressed: _isBusy
@@ -114,6 +125,7 @@ class _AuthViewState extends State<AuthView> {
       _biometricType = biometricType;
       _buttonLabel = 'Autenticar usando $_biometricType';
       _isBusy = false;
+      _isActive = true;
     });
   }
 
