@@ -10,8 +10,7 @@ class Biometrics {
 
   /// Retorna um nome visual para o tipo de biometria que está ativa.
   static Future<String> getStringType() async {
-    List<BiometricType> availableBiometrics =
-        await LocalAuthentication().getAvailableBiometrics();
+    final availableBiometrics = await LocalAuthentication().getAvailableBiometrics();
 
     if (Platform.isIOS) {
       if (availableBiometrics.contains(BiometricType.face)) {
@@ -38,10 +37,10 @@ class Biometrics {
   /// usuário na primeira vez que autenticação for chamada. Caso o usuário não
   /// permita, será gerada uma exceção.
   static Future<bool> authenticate() {
-    String message =
-        'Aqui vai a sua mensagem explicando porque precisa de autenticação por biometria.';
+    final message = 'Aqui vai a sua mensagem explicando porque precisa de autenticação por biometria.';
 
-    return LocalAuthentication().authenticateWithBiometrics(
+    return LocalAuthentication().authenticate(
+      biometricOnly: true,
       localizedReason: message,
       useErrorDialogs: true,
       stickyAuth: true,

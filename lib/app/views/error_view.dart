@@ -11,7 +11,7 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ErrorArgs args = ModalRoute.of(context).settings.arguments;
+    final ErrorArgs args = ModalRoute.of(context)!.settings.arguments as ErrorArgs;
 
     return Scaffold(
       body: Padding(
